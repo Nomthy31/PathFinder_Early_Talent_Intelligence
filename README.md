@@ -110,7 +110,7 @@ if (completionTime < avgTime) score.analytical += 1;
 
 ### 1️⃣ Clone the repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/pathfinder-early-talent-intelligence.git
+git clone https://github.com/Nomthy31/Pathfinder_Early_Talent_Intelligence.git
 cd pathfinder-early-talent-intelligence
 ```
 ### 2️⃣ Install dependencies
