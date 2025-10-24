@@ -145,7 +145,7 @@ npm run dev
 |---------------------------:|-----------------------------:|-----------------------------------:|
 | **Koketso Ratlou**         | Project Lead / Frontend Dev  | Architecture, UX, Strategy         |
 | **Ntokozo Ndlovu**         | Frontend Dev                 | React components, dashboard        |
-| **Thato Mphahlele**        | UI-UX Designer               | Gamification, child-friendly UI    |
+| **Thato Mphahlele**        | UI-UX Designer/ Frontend Dev               | Gamification, child-friendly UI    |
 | **Nomcebo Nkomo**          | Backend Dev                  | API development, AI logic          |
 | **Phumlile Mtshali**       | Backend Dev                  | API development, Database logic     |
 | **Nomthandazo Mabena**     | Backend Dev                  | API development, Server-side validation|
