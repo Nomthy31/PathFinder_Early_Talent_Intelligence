@@ -162,4 +162,3 @@ Pathfinder is not just an edtech tool — it’s a future talent discovery syste
 ## 📜 License
 
 MIT License © 2025 Pathfinder Team
-
