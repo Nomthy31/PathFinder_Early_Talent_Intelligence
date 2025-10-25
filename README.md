@@ -77,7 +77,7 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 ## 🧠 Overview
 
-**Pathfinder** is an adaptive learning platform for Grades 1–9 that integrates CAPS-aligned curriculum (Math, Languages, Life Skills, and Arts) while detecting each child’s natural learning stream — whether they are more **artistic/creative** or **analytical/mathematical** — based on daily digital learning patterns.
+**Pathfinder** is an adaptive learning platform for Grades 1–9 that integrates CAPS-aligned curriculum (Math, Languages, and Arts) while detecting each child’s natural learning stream — whether they are more **artistic/creative** or **analytical/mathematical** or **balanced**— based on daily digital learning patterns.
 
 Our mission is to reimagine early education in South Africa by aligning how children learn with who they are — creating a future workforce that is both **skilled** and **fulfilled**.
 
@@ -182,7 +182,7 @@ if (completionTime < avgTime) score.analytical += 1;
 
 ### 1️⃣ Clone the repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/pathfinder-early-talent-intelligence.git
+git clone https://github.com/Nomthy31/Pathfinder_Early_Talent_Intelligence.git
 cd pathfinder-early-talent-intelligence
 ```
 ### 2️⃣ Install dependencies
