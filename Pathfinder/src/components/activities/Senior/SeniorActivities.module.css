@@ -1,0 +1,145 @@
+.container {
+  background: linear-gradient(135deg, #e0e7ff, #f8fafc);
+  min-height: 100vh;
+  padding: 2rem;
+  font-family: "Poppins", sans-serif;
+  border-radius: 20px;
+}
+
+.backButton {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.backButton:hover {
+  background: #b91c1c;
+  transform: scale(1.05);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  color: #1e3a8a;
+  margin-bottom: 0.5rem;
+}
+
+.header h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.gradeInfo {
+  text-align: center;
+  color: #4b5563;
+  margin-bottom: 2rem;
+}
+
+.mainContent {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+}
+
+.subjectPanel,
+.quizPanel {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  flex: 1;
+  min-width: 340px;
+}
+
+.quizCard {
+  text-align: center;
+}
+
+.questionText {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.optionBtn {
+  background: #e2e8f0;
+  border: none;
+  border-radius: 10px;
+  padding: 0.8rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.optionBtn:hover {
+  background: #cbd5e1;
+}
+
+.correct {
+  background: #bbf7d0 !important;
+  color: #166534;
+}
+
+.wrong {
+  background: #fecaca !important;
+  color: #991b1b;
+}
+
+.progress {
+  margin-top: 1rem;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.resultCard {
+  text-align: center;
+}
+
+.feedback {
+  margin: 1rem auto;
+  padding: 0.8rem;
+  border-radius: 12px;
+  width: 80%;
+}
+
+.feedback.correct {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.feedback.wrong {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.retryButton {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.2rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 1rem;
+  transition: all 0.2s ease;
+}
+
+.retryButton:hover {
+  background: #1d4ed8;
+  transform: scale(1.05);
+}

@@ -1,0 +1,99 @@
+.englishActivity {
+  text-align: center;
+  background: linear-gradient(135deg, #bbdefb, #c8e6c9);
+  padding: 2rem;
+  border-radius: 20px;
+  max-width: 500px;
+  margin: 2rem auto;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  font-family: "Comic Sans MS", "Poppins", sans-serif;
+  color: #333;
+}
+
+.icon {
+  color: #1976d2;
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+.letterCard {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.letter {
+  font-size: 5rem;
+  font-weight: bold;
+  color: #388e3c;
+}
+
+.word {
+  font-size: 1.4rem;
+  margin-top: 0.5rem;
+}
+
+.soundBtn {
+  background-color: #ffca28;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.soundBtn:hover {
+  transform: scale(1.1);
+  background-color: #fdd835;
+}
+
+.question {
+  margin: 1rem 0;
+}
+
+.question input {
+  width: 60px;
+  height: 40px;
+  text-align: center;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  border: 2px solid #90caf9;
+  margin-right: 10px;
+}
+
+.question button {
+  background-color: #42a5f5;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.feedback {
+  font-size: 1.4rem;
+  margin: 1rem 0;
+}
+
+.correct {
+  color: #2e7d32;
+  font-weight: bold;
+}
+
+.wrong {
+  color: #c62828;
+  font-weight: bold;
+}
+
+.scoreboard {
+  background: #fff;
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
