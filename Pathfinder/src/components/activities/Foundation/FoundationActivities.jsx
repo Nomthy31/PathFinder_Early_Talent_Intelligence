@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Confetti from "react-confetti";
 import {
   Smile,
@@ -17,7 +17,11 @@ import FoundationMathActivity from "./subjects/FoundationMathActivity";
 import FoundationEnglishActivity from "./subjects/FoundationEnglishActivity";
 import FoundationArtActivity from "./subjects/FoundationArtActivity";
 
+// ✅ Supabase client
+import { supabase } from "../../../lib/supabaseClient";
+
 const FoundationActivities = ({ subject, grade, onBack }) => {
+  // States
   const [showConfetti, setShowConfetti] = useState(false);
   const [feedback, setFeedback] = useState("neutral");
   const [completed, setCompleted] = useState(false);
@@ -28,7 +32,12 @@ const FoundationActivities = ({ subject, grade, onBack }) => {
   ]);
   const [slots] = useState(["circle", "square", "triangle"]);
 
-  // ✅ Play fun success/error sounds
+  // 🎯 Tracking metrics
+  const [userStats, setUserStats] = useState([]);
+  const [questionStartTime, setQuestionStartTime] = useState(Date.now());
+  const [retries, setRetries] = useState(0);
+
+  // 🔊 Play sounds
   const playSound = (type) => {
     const url =
       type === "success"
@@ -39,21 +48,7 @@ const FoundationActivities = ({ subject, grade, onBack }) => {
     audio.play().catch((err) => console.warn("Audio blocked:", err));
   };
 
-  // 🧠 Choose subject activity
-  const renderActivity = () => {
-    switch (subject.toLowerCase()) {
-      case "mathematics":
-        return <FoundationMathActivity grade={grade} />;
-      case "english":
-        return <FoundationEnglishActivity grade={grade} />;
-      case "art":
-        return <FoundationArtActivity grade={grade} />;
-      default:
-        return <p>No activity found for this subject.</p>;
-    }
-  };
-
-  // 🔊 Voice feedback
+  // 🎤 Voice feedback
   const speak = (text) => {
     if ("speechSynthesis" in window) {
       const utterance = new SpeechSynthesisUtterance(text);
@@ -69,25 +64,97 @@ const FoundationActivities = ({ subject, grade, onBack }) => {
   // 🎨 Drag & drop shape matching
   const handleDragEnd = (result) => {
     if (!result.destination) return;
-    const { destination } = result;
 
-    if (destination.droppableId === result.draggableId) {
-      setFeedback("correct");
-      playSound("success");
-      speak("Great job!");
-      setShowConfetti(true);
-      setShapes((prev) => prev.filter((s) => s.id !== result.draggableId));
+    const { destination, draggableId } = result;
+    const timeSpent = Date.now() - questionStartTime;
+    const correct = destination.droppableId === draggableId;
 
-      if (shapes.length === 1) {
-        setTimeout(() => setCompleted(true), 400);
-        speak("You matched all the shapes! Well done!");
-      }
+    // Update stats
+    setUserStats((prev) => [
+      ...prev,
+      {
+        subject,
+        grade,
+        timeSpent,
+        retries,
+        usedDrawing: true, // shape matching counts as drawing
+        usedVisual: true, // visual interaction
+        correct,
+      },
+    ]);
 
-      setTimeout(() => setShowConfetti(false), 2000);
-    } else {
+    if (!correct) {
+      setRetries(retries + 1);
       setFeedback("wrong");
       playSound("error");
       speak("Oops! Try again!");
+      return;
+    }
+
+    setFeedback("correct");
+    playSound("success");
+    speak("Great job!");
+    setShowConfetti(true);
+
+    setShapes((prev) => prev.filter((s) => s.id !== draggableId));
+
+    if (shapes.length === 1) {
+      setTimeout(() => setCompleted(true), 400);
+      speak("You matched all the shapes! Well done!");
+    }
+
+    setTimeout(() => setShowConfetti(false), 2000);
+    setRetries(0);
+    setQuestionStartTime(Date.now());
+  };
+
+  // 📝 Compute and send stats to Supabase when completed
+  useEffect(() => {
+    if (!completed || userStats.length === 0) return;
+
+    const avgTime =
+      userStats.reduce((acc, q) => acc + q.timeSpent, 0) / userStats.length;
+    const avgAccuracy =
+      (userStats.filter((q) => q.correct).length / userStats.length) * 100;
+    const avgRetries =
+      userStats.reduce((acc, q) => acc + q.retries, 0) / userStats.length;
+    const percentDrawing =
+      (userStats.filter((q) => q.usedDrawing).length / userStats.length) * 100;
+    const percentVisual =
+      (userStats.filter((q) => q.usedVisual).length / userStats.length) * 100;
+
+    const stats = {
+      student_id: "mock-student-001", // replace with logged-in user ID
+      subject,
+      grade,
+      avg_time: avgTime,
+      avg_accuracy: avgAccuracy,
+      avg_retries: avgRetries,
+      percent_drawing: percentDrawing,
+      percent_visual: percentVisual,
+      created_at: new Date().toISOString(),
+    };
+
+    supabase
+      .from("student_activity_stats")
+      .insert([stats])
+      .then(({ error }) => {
+        if (error) console.error("Failed to save stats:", error);
+        else console.log("Saved stats successfully!");
+      });
+  }, [completed]);
+
+  // ✅ Render subject-specific activity
+  const renderActivity = () => {
+    switch (subject.toLowerCase()) {
+      case "mathematics":
+        return <FoundationMathActivity grade={grade} />;
+      case "english":
+        return <FoundationEnglishActivity grade={grade} />;
+      case "art":
+        return <FoundationArtActivity grade={grade} />;
+      default:
+        return <p>No activity found for this subject.</p>;
     }
   };
 
@@ -104,10 +171,12 @@ const FoundationActivities = ({ subject, grade, onBack }) => {
       <AnimatedMascot feedback={feedback} />
 
       <div className={styles.activitiesWrapper}>
-        {/* 🎮 Left: Shape Matching Game */}
+        {/* Left: Shape Matching Game */}
         <div className={styles.shapeSection}>
           <h3 className={styles.subTitle}>Shape Matching Game</h3>
-          <p className={styles.instructions}>Drag the shapes into the correct outlines!</p>
+          <p className={styles.instructions}>
+            Drag the shapes into the correct outlines!
+          </p>
 
           <DragDropContext onDragEnd={handleDragEnd}>
             <div className={styles.shapeBoard}>
@@ -164,7 +233,7 @@ const FoundationActivities = ({ subject, grade, onBack }) => {
           </DragDropContext>
         </div>
 
-        {/* 📘 Right: Subject-Specific Activity */}
+        {/* Right: Subject Activity */}
         <div className={styles.subjectSection}>{renderActivity()}</div>
       </div>
 
@@ -175,14 +244,14 @@ const FoundationActivities = ({ subject, grade, onBack }) => {
           animate={{ opacity: 1 }}
         >
           <Star size={70} color="#facc15" />
-          <p>Excellent work! 🎉</p>
+          <p>Excellent work!</p>
         </motion.div>
       )}
     </div>
   );
 };
 
-// 🧸 Mascot Component
+// Mascot Component
 const AnimatedMascot = ({ feedback }) => {
   const variants = {
     neutral: { scale: 1 },
@@ -201,13 +270,9 @@ const AnimatedMascot = ({ feedback }) => {
   return (
     <motion.div className={styles.mascot} variants={variants} animate={feedback}>
       <AnimatePresence mode="wait">
-        {feedback === "correct" && (
-          <Smile size={80} color="#10b981" key="happy" />
-        )}
+        {feedback === "correct" && <Smile size={80} color="#10b981" key="happy" />}
         {feedback === "wrong" && <Frown size={80} color="#ef4444" key="sad" />}
-        {feedback === "neutral" && (
-          <Smile size={80} color="#3b82f6" key="neutral" />
-        )}
+        {feedback === "neutral" && <Smile size={80} color="#3b82f6" key="neutral" />}
       </AnimatePresence>
     </motion.div>
   );

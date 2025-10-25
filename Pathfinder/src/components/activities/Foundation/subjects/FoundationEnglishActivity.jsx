@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Volume2, Smile, BookOpen } from "lucide-react";
-import styles from "./FoundationEnglishActivity.module.css"; // ✅ fixed import
+import styles from "./FoundationEnglishActivity.module.css";
 
 const letters = [
   {
@@ -28,21 +28,56 @@ const FoundationEnglishActivity = () => {
 
   const currentLetter = letters[current];
 
+  // ✅ Load voices when ready
+  const [voicesReady, setVoicesReady] = useState(false);
+  useEffect(() => {
+    if ("speechSynthesis" in window) {
+      const synth = window.speechSynthesis;
+      if (synth.getVoices().length > 0) {
+        setVoicesReady(true);
+      } else {
+        synth.onvoiceschanged = () => setVoicesReady(true);
+      }
+    }
+  }, []);
+
+  // 🔊 Function to play sound
   const playSound = () => {
     const audio = new Audio(currentLetter.sound);
     audio
       .play()
       .then(() => console.log("Sound played"))
       .catch((err) => console.warn("Playback blocked:", err));
+
+    // 👄 Speak the word too
+    speak(`${currentLetter.letter} for ${currentLetter.word}`);
+  };
+
+  // 🗣️ Speak helper
+  const speak = (text) => {
+    if (!("speechSynthesis" in window)) return;
+    const synth = window.speechSynthesis;
+    const voices = synth.getVoices();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-US";
+    utterance.pitch = 0.9;
+    utterance.rate = 0.8;
+    utterance.volume = 1;
+    utterance.voice = voices.find((v) => v.lang.startsWith("en")) || null;
+
+    synth.cancel(); // stop previous speech
+    synth.speak(utterance);
   };
 
   const handleSubmit = () => {
     if (input.toUpperCase() === currentLetter.letter) {
       setFeedback("correct");
       setScore(score + 1);
-      setTimeout(() => nextLetter(), 1000);
+      speak("Great job!");
+      setTimeout(() => nextLetter(), 1200);
     } else {
       setFeedback("wrong");
+      speak("Oops! Try again!");
     }
   };
 
@@ -79,8 +114,12 @@ const FoundationEnglishActivity = () => {
       </div>
 
       <div className={styles.feedback}>
-        {feedback === "correct" && <div className={styles.correct}>🌟 Great Job!</div>}
-        {feedback === "wrong" && <div className={styles.wrong}>❌ Try Again!</div>}
+        {feedback === "correct" && (
+          <div className={styles.correct}>🌟 Great Job!</div>
+        )}
+        {feedback === "wrong" && (
+          <div className={styles.wrong}>❌ Try Again!</div>
+        )}
       </div>
 
       <div className={styles.scoreboard}>
