@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Volume2, Smile, BookOpen } from "lucide-react";
 import styles from "./FoundationEnglishActivity.module.css";
-import { supabase } from "../../../../lib/supabaseClient"; // ✅ adjust if path differs
+import { supabase } from "../../../../lib/supabaseClient"; // adjust path if needed
 
 const letters = [
   {
@@ -78,7 +78,7 @@ const FoundationEnglishActivity = ({ grade = "Foundation" }) => {
     const timeSpent = Date.now() - questionStartTime;
     const correct = input.toUpperCase() === currentLetter.letter;
 
-    // Record attempt
+    // Record attempt with linguistic flag
     setUserStats((prev) => [
       ...prev,
       {
@@ -88,6 +88,7 @@ const FoundationEnglishActivity = ({ grade = "Foundation" }) => {
         retries,
         usedDrawing: false,
         usedVisual: true,
+        usedLinguistic: true, // ✅ track English specifically
         correct,
       },
     ]);
@@ -116,7 +117,7 @@ const FoundationEnglishActivity = ({ grade = "Foundation" }) => {
     setQuestionStartTime(Date.now());
   };
 
-  // ✅ Auto-save stats when done
+  // ✅ Auto-save stats when activity completes
   useEffect(() => {
     if (!completed || userStats.length === 0) return;
 
@@ -130,9 +131,13 @@ const FoundationEnglishActivity = ({ grade = "Foundation" }) => {
       (userStats.filter((q) => q.usedDrawing).length / userStats.length) * 100;
     const percentVisual =
       (userStats.filter((q) => q.usedVisual).length / userStats.length) * 100;
+    const percentLinguistic =
+      (userStats.filter((q) => q.usedLinguistic && q.correct).length /
+        userStats.length) *
+        100 || 0;
 
     const stats = {
-      student_id: "mock-student-001", // 🔁 replace with actual student id when integrated
+      student_id: "mock-student-001", // replace with logged-in user ID
       subject: "English",
       grade,
       avg_time: avgTime,
@@ -140,6 +145,7 @@ const FoundationEnglishActivity = ({ grade = "Foundation" }) => {
       avg_retries: avgRetries,
       percent_drawing: percentDrawing,
       percent_visual: percentVisual,
+      percent_linguistic: percentLinguistic,
       created_at: new Date().toISOString(),
     };
 

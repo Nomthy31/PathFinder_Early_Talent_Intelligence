@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BookOpen, CheckCircle2, XCircle } from "lucide-react";
 import styles from "./IntermediateEnglishActivity.module.css";
-import { supabase } from "../../../../lib/supabaseClient"; // ✅ make sure this path matches your structure
+import { supabase } from "../../../../lib/supabaseClient"; 
 
 const words = [
   { question: "Select the correct spelling:", options: ["beutiful", "beautiful", "beatiful"], answer: "beautiful" },
@@ -28,7 +28,7 @@ const IntermediateEnglishActivity = ({ grade = "Intermediate" }) => {
     const timeSpent = Date.now() - questionStartTime;
     const correct = option === words[index].answer;
 
-    // record individual question stats
+    // record question stats with linguistic flag
     setUserStats((prev) => [
       ...prev,
       {
@@ -38,6 +38,7 @@ const IntermediateEnglishActivity = ({ grade = "Intermediate" }) => {
         retries,
         usedDrawing: false,
         usedVisual: true,
+        usedLinguistic: true, // ✅ track English
         correct,
       },
     ]);
@@ -92,9 +93,13 @@ const IntermediateEnglishActivity = ({ grade = "Intermediate" }) => {
       (userStats.filter((q) => q.usedDrawing).length / userStats.length) * 100;
     const percentVisual =
       (userStats.filter((q) => q.usedVisual).length / userStats.length) * 100;
+    const percentLinguistic =
+      (userStats.filter((q) => q.usedLinguistic && q.correct).length /
+        userStats.length) *
+        100 || 0;
 
     const stats = {
-      student_id: "mock-student-001", // ✅ replace with logged-in user ID later
+      student_id: "mock-student-001", // replace with actual logged-in user ID
       subject: "English",
       grade,
       avg_time: avgTime,
@@ -102,6 +107,7 @@ const IntermediateEnglishActivity = ({ grade = "Intermediate" }) => {
       avg_retries: avgRetries,
       percent_drawing: percentDrawing,
       percent_visual: percentVisual,
+      percent_linguistic: percentLinguistic, // ✅ English-specific
       created_at: new Date().toISOString(),
     };
 

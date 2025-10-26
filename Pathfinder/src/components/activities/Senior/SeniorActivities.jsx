@@ -25,7 +25,7 @@ const SeniorActivities = ({ subject, grade, onBack }) => {
     { question: "If y = 2x + 3 and x = 5, find y.", options: ["10","11","13","7"], correct: "13" },
   ];
 
-  const handleAnswer = (option, usedVisual = true, usedDrawing = false) => {
+  const handleAnswer = (option, usedVisual = true, usedDrawing = false, usedLinguistic = subject.toLowerCase() === "english") => {
     const timeSpent = Date.now() - questionStartTime;
     const correct = option === questions[currentQuestion].correct;
 
@@ -39,6 +39,7 @@ const SeniorActivities = ({ subject, grade, onBack }) => {
         retries,
         usedVisual,
         usedDrawing,
+        usedLinguistic,
         correct,
       },
     ]);
@@ -91,6 +92,8 @@ const SeniorActivities = ({ subject, grade, onBack }) => {
       (userStats.filter((q) => q.usedDrawing).length / userStats.length) * 100;
     const percentVisual =
       (userStats.filter((q) => q.usedVisual).length / userStats.length) * 100;
+    const percentLinguistic =
+      (userStats.filter((q) => q.usedLinguistic && q.correct).length / userStats.length) * 100 || 0;
 
     const stats = {
       student_id: "mock-student-001", // replace with actual student ID
@@ -101,6 +104,7 @@ const SeniorActivities = ({ subject, grade, onBack }) => {
       avg_retries: avgRetries,
       percent_drawing: percentDrawing,
       percent_visual: percentVisual,
+      percent_linguistic: percentLinguistic,
       created_at: new Date().toISOString(),
     };
 
