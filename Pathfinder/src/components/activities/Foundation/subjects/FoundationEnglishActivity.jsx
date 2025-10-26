@@ -1,24 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Volume2, Smile, BookOpen } from "lucide-react";
 import styles from "./FoundationEnglishActivity.module.css";
-import { supabase } from "../../../../lib/supabaseClient"; // adjust path if needed
+import { supabase } from "../../../../lib/supabaseClient";
+import useActivityTracker from "../../../hooks/useActivityTracker";
 
 const letters = [
-  {
-    letter: "A",
-    word: "Apple",
-    sound: "https://assets.mixkit.co/sfx/preview/mixkit-interface-click-1126.mp3",
-  },
-  {
-    letter: "B",
-    word: "Ball",
-    sound: "https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3",
-  },
-  {
-    letter: "C",
-    word: "Cat",
-    sound: "https://assets.mixkit.co/sfx/preview/mixkit-funny-fail-low-tone-2876.mp3",
-  },
+  { letter: "A", word: "Apple", sound: "https://assets.mixkit.co/sfx/preview/mixkit-interface-click-1126.mp3" },
+  { letter: "B", word: "Ball", sound: "https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3" },
+  { letter: "C", word: "Cat", sound: "https://assets.mixkit.co/sfx/preview/mixkit-funny-fail-low-tone-2876.mp3" },
 ];
 
 const FoundationEnglishActivity = ({ grade = "Foundation" }) => {
@@ -28,38 +17,21 @@ const FoundationEnglishActivity = ({ grade = "Foundation" }) => {
   const [score, setScore] = useState(0);
   const [completed, setCompleted] = useState(false);
 
-  // Tracking for Supabase
-  const [userStats, setUserStats] = useState([]);
-  const [questionStartTime, setQuestionStartTime] = useState(Date.now());
-  const [retries, setRetries] = useState(0);
+  // ✅ Use the hook for tracking stats
+  const { userStats, recordAnswer, calculateMetrics } = useActivityTracker("English");
 
   const currentLetter = letters[current];
 
-  // ✅ Load voices when ready
+  // Load voices for TTS
   const [voicesReady, setVoicesReady] = useState(false);
   useEffect(() => {
     if ("speechSynthesis" in window) {
       const synth = window.speechSynthesis;
-      if (synth.getVoices().length > 0) {
-        setVoicesReady(true);
-      } else {
-        synth.onvoiceschanged = () => setVoicesReady(true);
-      }
+      if (synth.getVoices().length > 0) setVoicesReady(true);
+      else synth.onvoiceschanged = () => setVoicesReady(true);
     }
   }, []);
 
-  // 🔊 Play letter sound + TTS
-  const playSound = () => {
-    const audio = new Audio(currentLetter.sound);
-    audio
-      .play()
-      .then(() => console.log("Sound played"))
-      .catch((err) => console.warn("Playback blocked:", err));
-
-    speak(`${currentLetter.letter} for ${currentLetter.word}`);
-  };
-
-  // 🗣️ Text-to-speech helper
   const speak = (text) => {
     if (!("speechSynthesis" in window)) return;
     const synth = window.speechSynthesis;
@@ -68,84 +40,47 @@ const FoundationEnglishActivity = ({ grade = "Foundation" }) => {
     utterance.lang = "en-US";
     utterance.pitch = 0.9;
     utterance.rate = 0.8;
-    utterance.volume = 1;
     utterance.voice = voices.find((v) => v.lang.startsWith("en")) || null;
     synth.cancel();
     synth.speak(utterance);
   };
 
+  const playSound = () => {
+    const audio = new Audio(currentLetter.sound);
+    audio.play().catch((err) => console.warn("Playback blocked:", err));
+    speak(`${currentLetter.letter} for ${currentLetter.word}`);
+  };
+
   const handleSubmit = () => {
-    const timeSpent = Date.now() - questionStartTime;
     const correct = input.toUpperCase() === currentLetter.letter;
 
-    // Record attempt with linguistic flag
-    setUserStats((prev) => [
-      ...prev,
-      {
-        subject: "English",
-        grade,
-        timeSpent,
-        retries,
-        usedDrawing: false,
-        usedVisual: true,
-        usedLinguistic: true, // ✅ track English specifically
-        correct,
-      },
-    ]);
+    // Record stats using the hook
+    recordAnswer(correct, true, false); // usedVisual = true, usedDrawing = false
+    setFeedback(correct ? "correct" : "wrong");
 
-    if (correct) {
-      setFeedback("correct");
-      setScore(score + 1);
-      speak("Great job!");
-      if (current === letters.length - 1) {
-        setTimeout(() => setCompleted(true), 1000);
-      } else {
-        setTimeout(() => nextLetter(), 1200);
-      }
-    } else {
-      setFeedback("wrong");
-      setRetries(retries + 1);
-      speak("Oops! Try again!");
-    }
+    if (correct) setScore(score + 1);
+    else setFeedback("wrong");
+
+    if (current === letters.length - 1) setCompleted(true);
+    else setTimeout(() => nextLetter(), 800);
   };
 
   const nextLetter = () => {
-    const next = (current + 1) % letters.length;
-    setCurrent(next);
+    setCurrent((prev) => (prev + 1) % letters.length);
     setFeedback("");
     setInput("");
-    setQuestionStartTime(Date.now());
   };
 
-  // ✅ Auto-save stats when activity completes
+  // Save stats to Supabase on completion
   useEffect(() => {
-    if (!completed || userStats.length === 0) return;
+    if (!completed) return;
 
-    const avgTime =
-      userStats.reduce((acc, q) => acc + q.timeSpent, 0) / userStats.length;
-    const avgAccuracy =
-      (userStats.filter((q) => q.correct).length / userStats.length) * 100;
-    const avgRetries =
-      userStats.reduce((acc, q) => acc + q.retries, 0) / userStats.length;
-    const percentDrawing =
-      (userStats.filter((q) => q.usedDrawing).length / userStats.length) * 100;
-    const percentVisual =
-      (userStats.filter((q) => q.usedVisual).length / userStats.length) * 100;
-    const percentLinguistic =
-      (userStats.filter((q) => q.usedLinguistic && q.correct).length /
-        userStats.length) *
-        100 || 0;
-
+    const metrics = calculateMetrics();
     const stats = {
-      student_id: "mock-student-001", // replace with logged-in user ID
+      student_id: "mock-student-001",
       subject: "English",
       grade,
-      avg_time: avgTime,
-      avg_accuracy: avgAccuracy,
-      avg_retries: avgRetries,
-      percent_drawing: percentDrawing,
-      percent_visual: percentVisual,
-      percent_linguistic: percentLinguistic,
+      ...metrics,
       created_at: new Date().toISOString(),
     };
 
@@ -153,8 +88,8 @@ const FoundationEnglishActivity = ({ grade = "Foundation" }) => {
       .from("student_activity_stats")
       .insert([stats])
       .then(({ error }) => {
-        if (error) console.error("❌ Error saving English stats:", error);
-        else console.log("✅ English stats saved to Supabase");
+        if (error) console.error("❌ Error saving stats:", error);
+        else console.log("✅ Stats saved!", stats);
       });
   }, [completed]);
 
@@ -186,12 +121,8 @@ const FoundationEnglishActivity = ({ grade = "Foundation" }) => {
           </div>
 
           <div className={styles.feedback}>
-            {feedback === "correct" && (
-              <div className={styles.correct}>🌟 Great Job!</div>
-            )}
-            {feedback === "wrong" && (
-              <div className={styles.wrong}>❌ Try Again!</div>
-            )}
+            {feedback === "correct" && <div className={styles.correct}>🌟 Great Job!</div>}
+            {feedback === "wrong" && <div className={styles.wrong}>❌ Try Again!</div>}
           </div>
 
           <div className={styles.scoreboard}>

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { BookOpen, CheckCircle2, XCircle } from "lucide-react";
 import styles from "./IntermediateEnglishActivity.module.css";
-import { supabase } from "../../../../lib/supabaseClient"; 
+import useActivityTracker from "../../../hooks/useActivityTracker"; // adjust path
 
 const words = [
   { question: "Select the correct spelling:", options: ["beutiful", "beautiful", "beatiful"], answer: "beautiful" },
@@ -18,107 +18,31 @@ const IntermediateEnglishActivity = ({ grade = "Intermediate" }) => {
   const [score, setScore] = useState(0);
   const [completed, setCompleted] = useState(false);
 
-  // 🎯 tracking stats
-  const [userStats, setUserStats] = useState([]);
-  const [questionStartTime, setQuestionStartTime] = useState(Date.now());
-  const [retries, setRetries] = useState(0);
+  const { recordAnswer, userStats } = useActivityTracker("English");
 
   const handleSelect = (option) => {
-    setSelected(option);
-    const timeSpent = Date.now() - questionStartTime;
     const correct = option === words[index].answer;
 
-    // record question stats with linguistic flag
-    setUserStats((prev) => [
-      ...prev,
-      {
-        subject: "English",
-        grade,
-        timeSpent,
-        retries,
-        usedDrawing: false,
-        usedVisual: true,
-        usedLinguistic: true, // ✅ track English
-        correct,
-      },
-    ]);
+    // Record answer in hook
+    recordAnswer(correct, true, false); // usedVisual: true, usedDrawing: false
 
-    if (correct) {
-      setFeedback("correct");
-      setScore(score + 1);
-      playSound("success");
+    setSelected(option);
+    setFeedback(correct ? "correct" : "wrong");
 
-      if (index === words.length - 1) {
-        setTimeout(() => setCompleted(true), 1000);
-      } else {
-        setTimeout(() => nextQuestion(), 1000);
-      }
+    if (correct) setScore((prev) => prev + 1);
+
+    if (index === words.length - 1) {
+      setTimeout(() => setCompleted(true), 800);
     } else {
-      setFeedback("wrong");
-      setRetries(retries + 1);
-      playSound("error");
+      setTimeout(() => nextQuestion(), 800);
     }
   };
 
   const nextQuestion = () => {
-    setFeedback("");
+    setIndex((prev) => prev + 1);
     setSelected("");
-    setIndex((prev) => (prev < words.length - 1 ? prev + 1 : prev));
-    setQuestionStartTime(Date.now());
+    setFeedback("");
   };
-
-  // 🔊 sound function (unchanged)
-  const playSound = (type) => {
-    const url =
-      type === "success"
-        ? "https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"
-        : "https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg";
-    const audio = new Audio(url);
-    audio.currentTime = 0;
-    audio.volume = 0.7;
-    audio.play().catch((err) => console.warn("⚠️ Audio playback blocked:", err));
-  };
-
-  // ✅ Send stats to Supabase after completion
-  useEffect(() => {
-    if (!completed || userStats.length === 0) return;
-
-    const avgTime =
-      userStats.reduce((acc, q) => acc + q.timeSpent, 0) / userStats.length;
-    const avgAccuracy =
-      (userStats.filter((q) => q.correct).length / userStats.length) * 100;
-    const avgRetries =
-      userStats.reduce((acc, q) => acc + q.retries, 0) / userStats.length;
-    const percentDrawing =
-      (userStats.filter((q) => q.usedDrawing).length / userStats.length) * 100;
-    const percentVisual =
-      (userStats.filter((q) => q.usedVisual).length / userStats.length) * 100;
-    const percentLinguistic =
-      (userStats.filter((q) => q.usedLinguistic && q.correct).length /
-        userStats.length) *
-        100 || 0;
-
-    const stats = {
-      student_id: "mock-student-001", // replace with actual logged-in user ID
-      subject: "English",
-      grade,
-      avg_time: avgTime,
-      avg_accuracy: avgAccuracy,
-      avg_retries: avgRetries,
-      percent_drawing: percentDrawing,
-      percent_visual: percentVisual,
-      percent_linguistic: percentLinguistic, // ✅ English-specific
-      created_at: new Date().toISOString(),
-    };
-
-    supabase
-      .from("student_activity_stats")
-      .insert([stats])
-      .then(({ error }) => {
-        if (error) console.error("❌ Failed to save English stats:", error);
-        else console.log("✅ English stats saved successfully!");
-      });
-  }, [completed]);
 
   return (
     <div className={styles.container}>
@@ -134,9 +58,7 @@ const IntermediateEnglishActivity = ({ grade = "Intermediate" }) => {
             {words[index].options.map((option) => (
               <button
                 key={option}
-                className={`${styles.optionBtn} ${
-                  selected === option ? styles.selected : ""
-                }`}
+                className={`${styles.optionBtn} ${selected === option ? styles.selected : ""}`}
                 onClick={() => handleSelect(option)}
               >
                 {option}

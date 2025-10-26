@@ -8,9 +8,12 @@ export default function useActivityTracker(subject) {
 
   useEffect(() => {
     setQuestionStartTime(Date.now());
-  }, [subject]); // reset when new subject starts
+  }, [subject]); // reset timer when new subject starts
 
-  const recordAnswer = (isCorrect, usedVisual = false, usedDrawing = false) => {
+  const recordAnswer = (
+    isCorrect,
+    { usedVisual = false, usedDrawing = false, usedLinguistic = false } = {}
+  ) => {
     const timeSpent = Date.now() - questionStartTime;
 
     setUserStats((prev) => [
@@ -20,12 +23,14 @@ export default function useActivityTracker(subject) {
         retries,
         usedVisual,
         usedDrawing,
+        usedLinguistic,
         correct: isCorrect,
       },
     ]);
 
     if (!isCorrect) setRetries((r) => r + 1);
     else setRetries(0);
+    setQuestionStartTime(Date.now());
   };
 
   const calculateMetrics = () => {
@@ -36,19 +41,20 @@ export default function useActivityTracker(subject) {
     const averageRetries = avg(data.reduce((a, q) => a + q.retries, 0));
     const averageAccuracy =
       (data.filter((q) => q.correct).length / data.length) * 100 || 0;
-    const usesDrawingRatio =
-      data.filter((q) => q.usedDrawing).length / data.length || 0;
+    const usesDrawingRatio = (data.filter((q) => q.usedDrawing).length / data.length) || 0;
     const percentVisual =
-      (data.filter((q) => q.usedVisual && q.correct).length / data.length) *
-        100 || 0;
+      (data.filter((q) => q.usedVisual && q.correct).length / data.length) * 100 || 0;
+    const percentLinguistic =
+      (data.filter((q) => q.usedLinguistic && q.correct).length / data.length) * 100 || 0;
 
     return {
       avg_time: averageTime,
-      percent_visual: percentVisual,
-      percent_numeric: 100 - percentVisual,
-      percent_drawing: usesDrawingRatio * 100,
       avg_retries: averageRetries,
       avg_accuracy: averageAccuracy,
+      percent_visual: percentVisual,
+      percent_numeric: 100 - percentVisual - percentLinguistic,
+      percent_drawing: usesDrawingRatio * 100,
+      percent_linguistic: percentLinguistic,
       uses_drawing_ratio: usesDrawingRatio,
     };
   };
