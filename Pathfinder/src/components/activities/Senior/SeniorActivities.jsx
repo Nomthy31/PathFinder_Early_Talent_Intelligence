@@ -111,7 +111,7 @@ const SeniorActivities = ({ subject, grade, onBack }) => {
         if (error) console.error("Failed to save stats:", error);
         else console.log("Stats saved successfully!");
       });
-  }, [showResult]);
+  }, [showResult, userStats, subject, grade]);
 
   return (
     <div className={styles.container}>

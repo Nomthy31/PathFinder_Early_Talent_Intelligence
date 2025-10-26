@@ -142,7 +142,7 @@ const FoundationActivities = ({ subject, grade, onBack }) => {
         if (error) console.error("Failed to save stats:", error);
         else console.log("Saved stats successfully!");
       });
-  }, [completed]);
+  }, [completed, userStats, subject, grade]);
 
   // ✅ Render subject-specific activity
   const renderActivity = () => {
