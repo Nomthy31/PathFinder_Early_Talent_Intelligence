@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Volume2, Smile, BookOpen } from "lucide-react";
 import styles from "./FoundationEnglishActivity.module.css";
 import { supabase } from "../../../../lib/supabaseClient";
-import useActivityTracker from "../../../hooks/useActivityTracker";
+import useActivityTracker from "../../../../hooks/useActivityTracker";
 
 const letters = [
   { letter: "A", word: "Apple", sound: "https://assets.mixkit.co/sfx/preview/mixkit-interface-click-1126.mp3" },

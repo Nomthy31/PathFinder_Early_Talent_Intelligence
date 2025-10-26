@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BookOpen, CheckCircle2, XCircle } from "lucide-react";
 import styles from "./SeniorEnglishActivity.module.css";
-import useActivityTracker from "../../../hooks/useActivityTracker"; // adjust path
+import useActivityTracker from "../../../../hooks/useActivityTracker"; // adjust path
 
 const englishQuestions = [
   { question: "Identify the verb: 'The cat chased the mouse.'", options: ["cat", "chased", "mouse"], answer: "chased" },

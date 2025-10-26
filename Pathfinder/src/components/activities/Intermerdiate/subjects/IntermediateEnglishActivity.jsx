@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BookOpen, CheckCircle2, XCircle } from "lucide-react";
 import styles from "./IntermediateEnglishActivity.module.css";
-import useActivityTracker from "../../../hooks/useActivityTracker"; // adjust path
+import useActivityTracker from "../../../../hooks/useActivityTracker"; // adjust path
 
 const words = [
   { question: "Select the correct spelling:", options: ["beutiful", "beautiful", "beatiful"], answer: "beautiful" },
