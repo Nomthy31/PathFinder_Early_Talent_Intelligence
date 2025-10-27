@@ -1,4 +1,3 @@
-// src/App.jsx
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -16,7 +15,6 @@ function App() {
   const storedTeacher = JSON.parse(localStorage.getItem("teacherData")) || {};
   const [classes, setClasses] = useState(storedTeacher.classes || []);
 
-  // Keep localStorage updated whenever classes change
   useEffect(() => {
     if (storedTeacher.name) {
       localStorage.setItem(
@@ -39,7 +37,7 @@ function App() {
           path="/classes"
           element={<Classes classes={classes} setClasses={setClasses} />}
         />
-        <Route path="/students" element={<Students />} />
+        <Route path="/students" element={<Students classes={classes} setClasses={setClasses} />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Routes>
     </Router>

@@ -1,8 +1,13 @@
 import React, { useState } from "react";
-import { BookOpen, ArrowLeftCircle, Star } from "lucide-react";
-import SubjectSelect from "./components/subjectsSelect";
+import { ArrowLeftCircle, Star, BookOpen, Calculator, Pencil, Palette } from "lucide-react";
 import Activities from "./components/activities";
 import styles from "./App.module.css";
+
+const subjects = [
+  { name: "Mathematics", icon: <Calculator size={32} />, gradient: "linear-gradient(135deg, #60a5fa, #93c5fd)" },
+  { name: "English", icon: <Pencil size={32} />, gradient: "linear-gradient(135deg, #f472b6, #f9a8d4)" },
+  { name: "Arts", icon: <Palette size={32} />, gradient: "linear-gradient(135deg, #34d399, #6ee7b7)" },
+];
 
 const App = () => {
   const [selectedSubject, setSelectedSubject] = useState(null);
@@ -12,17 +17,32 @@ const App = () => {
   if (!selectedSubject) {
     return (
       <div className={styles.pageWrapper}>
-        <BookOpen className={styles.mainIcon} size={80} />
-        <h1 className={styles.title}>Pathfinder Learning Activities</h1>
-        <p className={styles.subtitle}>
-          Choose a subject to begin your adventure!
-        </p>
-        <SubjectSelect onSelect={(subject) => setSelectedSubject(subject)} />
+        {/* Heading + Book Icon at top */}
+        <div className={styles.headingContainer}>
+          <BookOpen className={styles.mainIcon} size={50} />
+          <h1 className={styles.title}>Pathfinder Learning Activities</h1>
+        </div>
+        <p className={styles.subtitleAboveSubjects}>Choose a subject to begin your adventure!</p>
+
+        {/* Horizontal subject boxes */}
+        <div className={styles.subjectContainer}>
+          {subjects.map((subject) => (
+            <div
+              key={subject.name}
+              className={styles.subjectBox}
+              onClick={() => setSelectedSubject(subject.name)}
+              style={{ background: subject.gradient }}
+            >
+              <div className="mb-2">{subject.icon}</div>
+              <div>{subject.name}</div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
-  // Step 2: Select Grade
+  // Step 2: Select Grade (unchanged from your original)
   if (!selectedGrade) {
     return (
       <div className={styles.pageWrapper}>

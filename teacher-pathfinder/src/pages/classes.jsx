@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LayoutDashboard, BookOpen, Users, Settings, LogOut, Plus, Trash2, Edit, Search } from "lucide-react";
+import logo from "../assets/pathfinder-logo.png";
 
 const Classes = ({ classes, setClasses }) => {
   const location = useLocation();
@@ -49,10 +50,18 @@ const Classes = ({ classes, setClasses }) => {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
+      {/* Sidebar */}
       <aside className="w-64 bg-white shadow-lg flex flex-col">
         <div className="p-5 border-b flex items-center gap-3">
-          <h1 className="text-xl font-bold tracking-wide text-blue-600">Teacher Portal</h1>
+          <img src={logo} alt="Logo" className="w-10 h-10 object-contain" />
+          <h1
+            className="text-xl font-bold tracking-wide"
+            style={{ color: "#6fb7de" }}
+          >
+            Teacher Portal
+          </h1>
         </div>
+
         <nav className="flex-1 p-4 space-y-3">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
@@ -71,6 +80,7 @@ const Classes = ({ classes, setClasses }) => {
             );
           })}
         </nav>
+
         <div className="p-4 border-t">
           <button
             onClick={() => navigate("/")}
@@ -81,6 +91,7 @@ const Classes = ({ classes, setClasses }) => {
         </div>
       </aside>
 
+      {/* Main Content */}
       <main className="flex-1 p-8">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-blue-600">Classes</h2>

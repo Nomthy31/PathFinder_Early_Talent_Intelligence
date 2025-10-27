@@ -1,3 +1,4 @@
+// src/pages/ManageLearners.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -18,7 +19,6 @@ const ManageLearners = ({ classes = [], setClasses = () => {} }) => {
   const [learnerName, setLearnerName] = useState("");
   const [loadedClasses, setLoadedClasses] = useState([]);
 
-  // ✅ Load classes automatically from localStorage if not passed as props
   useEffect(() => {
     const teacherData = JSON.parse(localStorage.getItem("teacherData")) || {};
     if (classes.length === 0 && teacherData.classes) {
@@ -28,7 +28,6 @@ const ManageLearners = ({ classes = [], setClasses = () => {} }) => {
     }
   }, [classes]);
 
-  // ✅ Keep teacherData updated in localStorage
   useEffect(() => {
     const teacherData = JSON.parse(localStorage.getItem("teacherData")) || {};
     if (loadedClasses.length > 0) {
@@ -188,7 +187,6 @@ const ManageLearners = ({ classes = [], setClasses = () => {} }) => {
           </div>
         )}
 
-        {/* 📝 Little note at the bottom */}
         <div className="mt-10 text-center text-gray-500 italic">
           Don’t mind this layout, still waiting for Cebo on how we should
           structure the tables 
