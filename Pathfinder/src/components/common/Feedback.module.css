@@ -1,0 +1,19 @@
+.feedback {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.correct {
+  background: #d1fae5;
+  color: #16a34a;
+}
+
+.wrong {
+  background: #fee2e2;
+  color: #ef4444;
+}

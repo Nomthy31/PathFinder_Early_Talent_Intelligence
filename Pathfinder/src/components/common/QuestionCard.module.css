@@ -1,0 +1,43 @@
+.card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.questionText {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.optionBtn {
+  flex: 1 1 40%;
+  padding: 0.8rem;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.optionBtn:hover {
+  transform: scale(1.05);
+}
+
+.correct {
+  background: #16a34a;
+}
+
+.wrong {
+  background: #ef4444;
+}
